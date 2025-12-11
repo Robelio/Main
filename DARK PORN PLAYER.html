@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🔞 DARK PORN PLAYER 🔞</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Modal de Login */
+    .login-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .login-container {
+      background: linear-gradient(135deg, #1a0000, #330000);
+      border: 2px solid #ff0000;
+      border-radius: 10px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    }
+
+    .login-container h2 {
+      color: #ff0000;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background-color: #222;
+      border: 1px solid #ff0000;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .login-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .login-btn {
+      padding: 10px 20px;
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .login-btn:hover {
+      background-color: #cc0000;
+      transform: scale(1.05);
+    }
+
+    .error-message {
+      color: #ff3333;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #1a0000, #000);
+      border-right: 2px solid #ff0000;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 5px 0 15px rgba(255, 0, 0, 0.3);
+    }
+
+    .sidebar h2 {
+      color: #ff0000;
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ff0000;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    }
+
+    .btn {
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #ff0000;
+      padding: 12px 15px;
+      margin: 8px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      text-align: left;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn:hover {
+      background-color: #ff0000;
+      transform: translateX(5px);
+    }
+
+    .btn i {
+      margin-right: 10px;
+      color: #ff0000;
+    }
+
+    .btn:hover i {
+      color: #fff;
+    }
+
+    .categoria-container {
+      margin-bottom: 10px;
+    }
+
+    .categoria-btn {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .categoria-btn::after {
+      content: '\f107';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      transition: transform 0.3s;
+    }
+
+    .categoria-btn.expanded::after {
+      transform: rotate(180deg);
+    }
+
+    .canais-categoria {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      margin-left: 15px;
+      border-left: 1px dashed #ff0000;
+      padding-left: 10px;
+    }
+
+    .canais-categoria.expanded {
+      max-height: 1500px;
+    }
+
+    .canal-item {
+      padding: 10px;
+      margin: 5px 0;
+      background-color: #111;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+    }
+
+    .canal-item:hover {
+      background-color: #ff0000;
+      transform: translateX(5px);
+    }
+
+    .canal-item img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+
+    /* Conteúdo Principal */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-header {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      background: linear-gradient(90deg, #1a0000, #000);
+      border-bottom: 2px solid #ff0000;
+    }
+
+    .top-header img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .top-header h1 {
+      color: #ff0000;
+      font-size: 1.8rem;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    }
+
+    .player-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow: auto;
+    }
+
+    video {
+      width: 100%;
+      max-height: 60vh;
+      background-color: #000;
+      border: 2px solid #ff0000;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    .player-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .player-options button {
+      padding: 10px 15px;
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #ff0000;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .player-options button:hover {
+      background-color: #ff0000;
+      transform: scale(1.05);
+    }
+
+    #infoCanal {
+      padding: 10px;
+      background-color: #111;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      border-left: 4px solid #ff0000;
+    }
+
+    #toggleViewBtn {
+      align-self: flex-start;
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #ff0000;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    #toggleViewBtn:hover {
+      background-color: #ff0000;
+    }
+
+    #feitoPor {
+      align-self: flex-end;
+      color: #888;
+      font-size: 0.8rem;
+      margin-top: 10px;
+    }
+
+    /* Tema escuro */
+    body.tema-dark {
+      background-color: #111;
+    }
+
+    body.tema-dark .sidebar {
+      background: linear-gradient(180deg, #000, #111);
+    }
+
+    body.tema-dark .btn {
+      background-color: #111;
+    }
+
+    body.tema-dark .canal-item {
+      background-color: #000;
+    }
+
+    body.tema-dark .top-header {
+      background: linear-gradient(90deg, #000, #111);
+    }
+
+    body.tema-dark .player-options button {
+      background-color: #111;
+    }
+
+    body.tema-dark #toggleViewBtn {
+      background-color: #111;
+    }
+
+    /* Responsivo */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 2px solid #ff0000;
+      }
+      
+      .content {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Modal de Login -->
+  <div class="login-modal" id="loginModal">
+    <div class="login-container">
+      <h2>🔞 CONTEÚDO PARA MAIORES DE 18 ANOS 🔞</h2>
+      <p>Este site contém conteúdo adulto. Por favor, confirme sua idade para continuar.</p>
+      <input type="number" class="login-input" id="idadeInput" placeholder="Digite sua idade" min="1" max="120">
+      <input type="password" class="login-input" id="senhaInput" placeholder="Digite a senha" maxlength="4">
+      <div class="login-buttons">
+        <button class="login-btn" onclick="verificarLogin()">Acessar</button>
+        <button class="login-btn" onclick="sair()">Sair</button>
+      </div>
+      <div class="error-message" id="errorMessage"></div>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebar" style="display: none;">
+    <h2>🔞 DARK PORN PLAYER 🔞</h2>
+    <button class="btn dinamica" onclick="mostrarTodosCanais()">
+      <i class="fas fa-tv"></i> Todos os Canais
+    </button>
+    <div id="categoriasContainer"></div>
+  </div>
+
+  <div class="content" id="content" style="display: none;">
+    <div class="top-header">
+      <img src="data:image/png;base64,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" alt="XVIDEO">
+      <h1>🔞 DARK PORN PLAYER 🔞</h1>
+    </div>
+    <div class="player-area">
+      <video id="videoPlayer" controls crossorigin="anonymous"></video>
+      <div class="player-options">
+        <button onclick="alternarTema()">
+          <i class="fas fa-sync-alt"></i> Tema
+        </button>
+        <button onclick="limparLista()">
+          <i class="fas fa-trash"></i> Limpar
+        </button>
+        <button onclick="window.location.reload()">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </button>
+      </div>
+      <div id="infoCanal" aria-live="polite"></div>
+      <button id="toggleViewBtn" onclick="toggleView()">
+        <i class="fas fa-th"></i> Modo Grade (3 col)
+      </button>
+      <div id="feitoPor">Feito por darkmensageiro</div>
+    </div>
+  </div>
+  
+  <script>
+    // Garantir que o modal de login seja exibido ao carregar a página
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('loginModal').style.display = 'flex';
+      document.getElementById('idadeInput').focus();
+    });
+    
+    const listaURL = 'https://raw.githubusercontent.com/guedescomvc2025-bot/DARK-CANAIS-ADULTOS/refs/heads/main/dark_adultos.m3u';
+    const videoPlayer = document.getElementById('videoPlayer');
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('content');
+    const infoCanal = document.getElementById('infoCanal');
+    const toggleViewBtn = document.getElementById('toggleViewBtn');
+    const loginModal = document.getElementById('loginModal');
+    const idadeInput = document.getElementById('idadeInput');
+    const senhaInput = document.getElementById('senhaInput');
+    const errorMessage = document.getElementById('errorMessage');
+    const categoriasContainer = document.getElementById('categoriasContainer');
+    
+    let canais = [];
+    let categorias = [];
+    let hls = null;
+    let categoriaAtual = 'Todos';
+    let canalAtual = '';
+    let modoExibicao = 1;
+    let logado = false;
+    
+    function verificarLogin() {
+      const idade = parseInt(idadeInput.value);
+      const senha = senhaInput.value;
+      
+      // Limpar mensagem de erro
+      errorMessage.textContent = '';
+      
+      // Validar idade
+      if (isNaN(idade) || idade < 1) {
+        errorMessage.textContent = 'Por favor, digite uma idade válida.';
+        idadeInput.focus();
+        return;
+      }
+      
+      // Verificar se é maior de 18
+      if (idade < 18) {
+        errorMessage.textContent = 'Acesso negado. Você precisa ter 18 anos ou mais.';
+        idadeInput.focus();
+        return;
+      }
+      
+      // Verificar senha
+      if (senha !== '1234') {
+        errorMessage.textContent = 'Senha incorreta. Tente novamente.';
+        senhaInput.focus();
+        return;
+      }
+      
+      // Login bem sucedido
+      logado = true;
+      loginModal.style.display = 'none';
+      sidebar.style.display = 'flex';
+      content.style.display = 'flex';
+      carregarListaURL();
+    }
+    
+    function sair() {
+      window.location.href = 'about:blank';
+    }
+    
+    // Adicionar eventos de tecla para os inputs
+    idadeInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        senhaInput.focus();
+      }
+    });
+    
+    senhaInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        verificarLogin();
+      }
+    });
+    
+    async function carregarListaURL() {
+      if (!logado) return;
+      
+      try {
+        console.log("Carregando lista de canais...");
+        const res = await fetch(listaURL);
+        if(!res.ok) throw new Error('Erro HTTP ' + res.status);
+        const data = await res.text();
+        console.log("Lista carregada, processando...");
+        await processarM3UAsync(data);
+        console.log("Lista processada com sucesso!");
+      } catch (error) {
+        console.error('Erro ao carregar a lista:', error);
+        alert('Erro ao carregar a lista de canais: ' + error.message);
+      }
+    }
+    
+    async function processarM3UAsync(texto) {
+      canais = [];
+      categorias = [];
+      const setCategorias = new Set();
+      const lines = texto.split(/\r?\n/);
+      const chunkSize = 500;
+      let i = 0;
+      
+      while(i < lines.length) {
+        const chunk = lines.slice(i, i + chunkSize);
+        for (let j = 0; j < chunk.length; j++) {
+          if (chunk[j].startsWith('#EXTINF:')) {
+            const nome = chunk[j].split(',').pop().trim();
+            const grupoMatch = chunk[j].match(/group-title="([^"]+)"/i);
+            const grupo = grupoMatch ? grupoMatch[1].toLowerCase() : 'outros';
+            const logoMatch = chunk[j].match(/tvg-logo="([^"]+)"/i);
+            const logo = logoMatch ? logoMatch[1] : '';
+            const url = (chunk[j + 1] && chunk[j + 1].startsWith('http')) ? chunk[j + 1].trim() : '';
+            if (url) {
+              canais.push({ nome, grupo, url, logo });
+              setCategorias.add(grupo);
+            }
+          }
+        }
+        i += chunkSize;
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+      
+      categorias = Array.from(setCategorias);
+      console.log("Categorias encontradas:", categorias);
+      gerarCategorias();
+    }
+    
+    function gerarCategorias() {
+      categoriasContainer.innerHTML = '';
+      
+      categorias.forEach(cat => {
+        const catContainer = document.createElement('div');
+        catContainer.className = 'categoria-container';
+        
+        const catBtn = document.createElement('button');
+        catBtn.className = 'btn categoria-btn';
+        catBtn.innerHTML = `<i class="fas fa-folder"></i> ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+        catBtn.onclick = () => toggleCategoria(catBtn, cat);
+        
+        const canaisDiv = document.createElement('div');
+        canaisDiv.className = 'canais-categoria';
+        canaisDiv.id = `canais-${cat}`;
+        
+        catContainer.appendChild(catBtn);
+        catContainer.appendChild(canaisDiv);
+        categoriasContainer.appendChild(catContainer);
+        
+        // Preencher canais da categoria
+        const canaisFiltrados = canais.filter(c => c.grupo === cat);
+        canaisFiltrados.forEach(canal => {
+          const canalItem = document.createElement('div');
+          canalItem.className = 'canal-item';
+          canalItem.onclick = () => reproduzirStream(canal.url, canal.nome);
+          
+          if (canal.logo) {
+            const img = document.createElement('img');
+            img.src = canal.logo;
+            img.alt = canal.nome;
+            canalItem.appendChild(img);
+          }
+          
+          const spanNome = document.createElement('span');
+          spanNome.textContent = canal.nome;
+          canalItem.appendChild(spanNome);
+          
+          canaisDiv.appendChild(canalItem);
+        });
+      });
+    }
+    
+    function toggleCategoria(btn, categoria) {
+      const canaisDiv = document.getElementById(`canais-${categoria}`);
+      btn.classList.toggle('expanded');
+      canaisDiv.classList.toggle('expanded');
+    }
+    
+    function mostrarTodosCanais() {
+      // Fechar todas as categorias expandidas
+      document.querySelectorAll('.categoria-btn.expanded').forEach(btn => {
+        btn.classList.remove('expanded');
+      });
+      
+      document.querySelectorAll('.canais-categoria.expanded').forEach(div => {
+        div.classList.remove('expanded');
+      });
+      
+      // Reproduzir o primeiro canal da lista
+      if (canais.length > 0) {
+        reproduzirStream(canais[0].url, canais[0].nome);
+      }
+    }
+    
+    function formatarURL(url) {
+      if (!url.toLowerCase().includes('.m3u8')) {
+        const padrao = /\/(\w+)\/(\w+)\/(\d+)$/;
+        const match = url.match(padrao);
+        if (match && !url.includes('/live/')) {
+          const [_, usuario, senha, canal] = match;
+          const protocolo = url.startsWith('https') ? 'https://' : 'http://';
+          const hostPort = url.split('/')[2];
+          return `${protocolo}${hostPort}/live/${usuario}/${senha}/${canal}.m3u8`;
+        }
+      }
+      return url;
+    }
+    
+    function reproduzirStream(url, nomeCanal) {
+      canalAtual = nomeCanal || '';
+      infoCanal.textContent = `🔊 Tocando: ${canalAtual}`;
+      url = formatarURL(url);
+      
+      console.log("Reproduzindo stream:", url);
+      
+      if (hls && hls.url === url) {
+        videoPlayer.play().catch(() => {});
+        return;
+      }
+      
+      if (hls) {
+        hls.destroy();
+        hls = null;
+      }
+      
+      if (Hls.isSupported()) {
+        hls = new Hls({
+          maxBufferLength: 30,
+          enableWorker: true,
+          manifestLoadingTimeOut: 10000,
+          manifestLoadingMaxRetry: 3,
+          levelLoadingTimeOut: 10000,
+          levelLoadingMaxRetry: 3,
+          liveSyncDuration: 15,
+          liveMaxLatencyDuration: 30
+        });
+        
+        hls.url = url;
+        hls.loadSource(url);
+        hls.attachMedia(videoPlayer);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          videoPlayer.play().catch(() => {});
+        });
+        
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            switch(data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                hls.recoverMediaError();
+                break;
+              default:
+                hls.destroy();
+                alert('Erro fatal na reprodução: ' + data.details);
+                break;
+            }
+          }
+        });
+      } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+        if (videoPlayer.src !== url) {
+          videoPlayer.src = url;
+        }
+        videoPlayer.addEventListener('loadedmetadata', () => {
+          videoPlayer.play().catch(() => {});
+        }, { once: true });
+      } else {
+        alert("Este navegador não suporta reprodução de stream HLS (.m3u8)");
+      }
+    }
+    
+    function limparLista() {
+      canais = [];
+      categorias = [];
+      categoriasContainer.innerHTML = '';
+      infoCanal.textContent = '';
+      videoPlayer.pause();
+      videoPlayer.removeAttribute('src');
+      videoPlayer.load();
+      
+      if(hls) {
+        hls.destroy();
+        hls = null;
+      }
+    }
+    
+    function alternarTema() {
+      document.body.classList.toggle('tema-dark');
+    }
+    
+    function toggleView() {
+      // Esta função foi mantida para compatibilidade, mas não é mais necessária
+      // com o novo layout em cascata
+      modoExibicao = (modoExibicao + 1) % 3;
+      
+      if (modoExibicao === 1) {
+        toggleViewBtn.innerHTML = '<i class="fas fa-th"></i> Modo Grade (3 col)';
+      } else if (modoExibicao === 2) {
+        toggleViewBtn.innerHTML = '<i class="fas fa-th-large"></i> Modo Grade Compacta (2 col)';
+      } else {
+        toggleViewBtn.innerHTML = '<i class="fas fa-list"></i> Modo Lista (1 col)';
+      }
+    }
+  </script>
+</body>
+</html>
