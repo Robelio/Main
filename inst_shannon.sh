@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # =============================================================================
-# Script de Instalação Automática do Shannon Lite v2.0
-# Sistema: Ubuntu 22.04 (máquina local)
+# Script de Instalacao Automatica do Shannon Lite v2.1
+# Sistema: Ubuntu 22.04 (maquina local)
+# Correcao: Removido newgrp que encerrava o script apos etapa 3
 # =============================================================================
 
 # --- Cores para mensagens no terminal ---
@@ -12,7 +13,7 @@ VERMELHO='\033[0;31m'
 AZUL='\033[0;34m'
 RESET='\033[0m'
 
-# --- Funções auxiliares ---
+# --- Funcoes auxiliares ---
 info()    { echo -e "${AZUL}[INFO]${RESET} $1"; }
 sucesso() { echo -e "${VERDE}[OK]${RESET} $1"; }
 aviso()   { echo -e "${AMARELO}[AVISO]${RESET} $1"; }
@@ -29,7 +30,7 @@ verificar_comando() {
 # =============================================================================
 echo ""
 echo -e "${AZUL}=================================================${RESET}"
-echo -e "${AZUL}   Instalacao Automatica do Shannon Lite v2.0    ${RESET}"
+echo -e "${AZUL}   Instalacao Automatica do Shannon Lite v2.1    ${RESET}"
 echo -e "${AZUL}=================================================${RESET}"
 echo ""
 
@@ -97,11 +98,11 @@ else
   sucesso "Docker instalado."
 fi
 
-# --- Adicionar usuario ao grupo docker ---
-info "Configurando permissoes do Docker para o usuario atual..."
+# --- Adicionar usuario ao grupo docker (sem newgrp para nao encerrar o script) ---
+info "Configurando permissoes do Docker..."
 sudo usermod -aG docker "$USER"
-newgrp docker
 sucesso "Usuario adicionado ao grupo docker."
+aviso "Usaremos 'sudo' para comandos Docker nesta sessao. Apos reiniciar o terminal, sudo nao sera mais necessario."
 
 # =============================================================================
 # ETAPA 4 - Clonar o repositorio do Shannon
@@ -184,11 +185,11 @@ read -rp "Digite a URL do repositorio (ou pressione Enter para pular): " REPO_UR
 
 if [ -n "$REPO_URL" ]; then
   read -rp "Digite o nome da pasta (ex: meu-projeto): " REPO_NOME
-  git clone "$REPO_URL" "./repos/$REPO_NOME" || aviso "Falha ao clonar o repositorio alvo. Clone manualmente depois em ./repos/"
+  git clone "$REPO_URL" "./repos/$REPO_NOME" || aviso "Falha ao clonar. Clone manualmente depois em ./repos/"
   sucesso "Repositorio '$REPO_NOME' clonado em ./repos/"
   REPO_CONFIGURADO=$REPO_NOME
 else
-  aviso "Pulando clone do repositorio alvo. Clone manualmente em ./repos/ antes de iniciar."
+  aviso "Pulando clone do repositorio alvo. Clone manualmente em ./repos/ antes de iniciar o Shannon."
   REPO_CONFIGURADO=""
 fi
 
@@ -205,7 +206,7 @@ if [ -n "$REPO_CONFIGURADO" ]; then
   read -rp "Digite a URL do app a ser testado (ex: https://meu-app.com): " APP_URL
   echo ""
   info "Iniciando Shannon com: URL=$APP_URL REPO=$REPO_CONFIGURADO"
-  ./shannon start "URL=$APP_URL" "REPO=$REPO_CONFIGURADO" || erro "Falha ao iniciar o Shannon Lite."
+  sudo ./shannon start "URL=$APP_URL" "REPO=$REPO_CONFIGURADO" || erro "Falha ao iniciar o Shannon Lite."
 else
   aviso "Shannon nao iniciado automaticamente pois nenhum repositorio foi configurado."
   echo ""
@@ -219,7 +220,7 @@ echo -e "${VERDE}=================================================${RESET}"
 echo -e "${VERDE}   Shannon Lite instalado com sucesso!           ${RESET}"
 echo -e "${VERDE}=================================================${RESET}"
 echo ""
-echo -e "Comandos uteis:"
+echo -e "Comandos uteis (dentro da pasta shannon/):"
 echo "   Iniciar:        ./shannon start URL=https://app.com REPO=nome-repo"
 echo "   Ver logs:       ./shannon logs"
 echo "   Parar:          ./shannon stop"
